@@ -4,111 +4,322 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ประเมินราคารับจ้างเรียน ED</title>
-    <!-- ใช้ Tailwind CSS เพื่อความสวยงาม -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap');
         body { font-family: 'Prompt', sans-serif; }
+        
+        /* สไตล์สำหรับ Pop-up */
+        .modal-active { overflow: hidden; }
+        .modal-enter { opacity: 0; }
+        .modal-enter-active { opacity: 1; transition: opacity 200ms ease-in; }
+        .modal-scale-enter { transform: scale(0.9); opacity: 0; }
+        .modal-scale-enter-active { transform: scale(1); opacity: 1; transition: all 200ms ease-in; }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen p-4 flex items-center justify-center">
-    <div class="bg-white max-w-md w-full rounded-2xl shadow-xl overflow-hidden">
-        <div class="bg-blue-600 text-white p-6 text-center">
-            <h1 class="text-2xl font-semibold mb-2">บริการรับเก็บชั่วโมงเรียน</h1>
-            <p class="text-sm opacity-90">ประเมินราคาและส่งข้อมูลให้เราได้ทันที</p>
+<body class="bg-gray-100 min-h-screen p-4 flex items-center justify-center relative">
+    
+    <div class="bg-white max-w-xl w-full rounded-2xl shadow-xl overflow-hidden z-10">
+        <div class="bg-green-500 text-white p-6 text-center">
+            <h1 class="text-2xl font-semibold mb-1">English Discoveries</h1>
+            <p class="text-sm opacity-90">ประเมินราคาและส่งข้อมูลให้แอดมินทาง LINE</p>
         </div>
         
         <div class="p-6">
-            <form id="orderForm" class="space-y-4">
-                <!-- ข้อมูลลูกค้า -->
+            <!-- แจ้งเตือนเงื่อนไขสำคัญ -->
+            <div class="bg-amber-50 border-l-4 border-amber-500 p-4 mb-6 rounded-r-lg">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-amber-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-amber-800 font-medium">ประกาศสำคัญจากทางร้าน</p>
+                        <ul class="text-xs text-amber-700 mt-1 list-disc list-inside">
+                            <li><strong>งดรับงานเร่งด่วนชั่วคราว</strong> (งานปกติใช้เวลาทำ 1-3 วัน)</li>
+                            <li><strong>โอนเงินหลังจากงานเสร็จเรียบร้อยแล้วเท่านั้น</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <form id="orderForm" class="space-y-6">
+                <!-- ข้อมูลติดต่อ -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อ / ช่องทางติดต่อ (Line ID)</label>
-                    <input type="text" id="contactInfo" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="เช่น สมชาย ID Line: xxxx">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อลูกค้า (หรือ ชื่อเล่น)</label>
+                    <input type="text" id="contactInfo" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-green-500 outline-none">
                 </div>
 
-                <!-- เลเวล (สามารถปรับแก้ราคาด้านล่างตรง data-hr และ data-ch ได้) -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">ระดับความยาก (Level)</label>
-                    <select id="level" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
-                        <!-- data-hr = ราคาต่อชั่วโมง, data-ch = ราคาต่อบท -->
-                        <option value="1" data-hr="50" data-ch="100">Level 1 (เริ่มต้น)</option>
-                        <option value="2" data-hr="70" data-ch="150">Level 2 (ปานกลาง)</option>
-                        <option value="3" data-hr="100" data-ch="200">Level 3 (ขั้นสูง)</option>
+                <!-- ส่วนที่ 1: เลเวล -->
+                <div class="bg-gray-50 p-4 rounded-lg border">
+                    <label class="block text-sm font-semibold text-gray-800 mb-2">1. เลเวล (Level)</label>
+                    <select id="level" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-green-500 outline-none bg-white">
+                        <option value="A1" data-full="200" data-chap="25" data-test="100">A1 / FIRST DISCOVERIES / BASIC 1</option>
+                        <option value="A2" data-full="200" data-chap="25" data-test="100">A2 / BASIC 2 / BASIC 3</option>
+                        <option value="B1" data-full="250" data-chap="30" data-test="125">B1 / INTERMEDIATE 1 & 2</option>
+                        <option value="B2" data-full="250" data-chap="30" data-test="125">B2 / INTERMEDIATE 3 / ADVANCED 1</option>
+                        <option value="C1" data-full="300" data-chap="35" data-test="150">C1 / ADVANCED 2 / ADVANCED 3</option>
                     </select>
                 </div>
 
-                <!-- จำนวนชั่วโมงและบท -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">จำนวนชั่วโมง</label>
-                        <input type="number" id="hours" min="0" value="0" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">จำนวนบท</label>
-                        <input type="number" id="chapters" min="0" value="0" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                <!-- ส่วนที่ 2: รูปแบบการทำ -->
+                <div class="bg-gray-50 p-4 rounded-lg border">
+                    <label class="block text-sm font-semibold text-gray-800 mb-1">2. รูปแบบการทำ</label>
+                    
+                    <div class="grid grid-cols-1 gap-2 mt-3">
+                        <!-- แบบเหมา -->
+                        <label class="flex items-center space-x-2 bg-white border p-3 rounded-lg cursor-pointer hover:bg-green-50 transition">
+                            <input type="radio" name="serviceType" value="full" checked class="text-green-500 focus:ring-green-500 w-4 h-4">
+                            <span class="text-sm font-medium">เหมาทั้งเลเวล</span>
+                        </label>
+                        <!-- กล่องซ่อนสำหรับแบบเหมา -->
+                        <div id="extraUnitBox" class="ml-6 mr-2 mb-2 p-3 bg-white border border-gray-200 rounded-lg text-sm">
+                            <p class="text-xs text-red-500 mb-2 font-medium">*แต่ละโปรแกรมมีจำนวนบทไม่เท่ากัน</p>
+                            <select id="extraUnit" class="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-green-500 outline-none">
+                                <option value="0">10-14 บท (ปกติ)</option>
+                                <option value="50">15-19 บท (+50 บาท)</option>
+                                <option value="100">20+ บท (+100 บาท)</option>
+                            </select>
+                        </div>
+
+                        <!-- แบบทำบางบท -->
+                        <label class="flex items-center space-x-2 bg-white border p-3 rounded-lg cursor-pointer hover:bg-green-50 transition">
+                            <input type="radio" name="serviceType" value="chapter" class="text-green-500 focus:ring-green-500 w-4 h-4">
+                            <span class="text-sm font-medium">ทำบางบท (รายบท)</span>
+                        </label>
+                        <!-- กล่องซ่อนสำหรับทำบางบท -->
+                        <div id="chapterCountBox" class="hidden ml-6 mr-2 mb-2 p-3 bg-white border border-gray-200 rounded-lg">
+                            <label class="block text-xs font-medium text-gray-600 mb-1">จำนวนบทที่ต้องการทำ (สูงสุด 25 บท)</label>
+                            <input type="number" id="chapters" min="1" max="25" value="1" class="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-green-500 outline-none">
+                        </div>
+
+                        <!-- แบบทำแค่แบบทดสอบ -->
+                        <label class="flex items-center space-x-2 bg-white border p-3 rounded-lg cursor-pointer hover:bg-green-50 transition">
+                            <input type="radio" name="serviceType" value="test" class="text-green-500 focus:ring-green-500 w-4 h-4">
+                            <span class="text-sm font-medium">ทำแค่บททดสอบ <span class="text-gray-500 font-normal">(% ของช่องกลาง รีวิวท้ายบท)</span></span>
+                        </label>
                     </div>
                 </div>
 
-                <!-- ราคาประเมิน -->
-                <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 mt-6 text-center">
-                    <p class="text-sm text-gray-600 mb-1">ราคาประเมินเบื้องต้น</p>
-                    <div class="text-3xl font-bold text-blue-700"><span id="totalPrice">0</span> ฿</div>
+                <!-- ส่วนที่ 3: เพิ่มเวลาเรียน -->
+                <div class="bg-gray-50 p-4 rounded-lg border">
+                    <label class="block text-sm font-semibold text-gray-800 mb-2">3. เพิ่มเวลาเรียน (Time on Task)</label>
+                    <div class="bg-white p-3 border rounded-lg">
+                        <p class="text-xs text-gray-600 mb-3">โดยปกติทางเราใช้เวลาทำ <strong>5-10 ชั่วโมง</strong> หากต้องการเวลาที่นานกว่าปกติ (คิดเพิ่ม 5 บาท/ชม. <strong>เริ่มคิดเงินตั้งแต่ชั่วโมงที่ 7 เป็นต้นไป</strong>)</p>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-medium">ต้องการเวลาทั้งหมด:</span>
+                            <input type="number" id="totalHours" min="5" value="5" class="w-24 border border-gray-300 rounded p-2 focus:ring-2 focus:ring-green-500 outline-none bg-gray-50 text-center font-semibold">
+                            <span class="text-sm">ชั่วโมง</span>
+                        </div>
+                        <p id="hourCostWarning" class="text-xs text-red-500 mt-2 font-medium hidden">*(มีการบวกค่าชั่วโมงเพิ่ม)</p>
+                    </div>
                 </div>
 
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition duration-200 mt-4">
-                    ตกลงและส่งข้อมูล
+                <!-- สรุปราคา (สไตล์ใบเสร็จ) -->
+                <div class="bg-green-50 border border-green-200 rounded-xl p-5 mt-6 shadow-inner relative">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cG9seWdvbiBwb2ludHM9IjAsMCA4LDAgNCw4IiBmaWxsPSIjZjNmNGY2Ii8+Cjwvc3ZnPg==')] repeat-x"></div>
+                    
+                    <p class="text-sm font-semibold text-gray-700 mb-3 border-b border-dashed border-green-300 pb-2 mt-2">ใบแจ้งค่าบริการเบื้องต้น</p>
+                    
+                    <div id="priceBreakdown" class="space-y-2 text-sm text-gray-700 mb-4 font-mono">
+                        <!-- รายการจะถูกแทรกที่นี่ด้วย JavaScript -->
+                    </div>
+
+                    <div class="flex justify-between items-end border-t border-dashed border-green-300 pt-3">
+                        <span class="font-bold text-gray-800">ยอดสุทธิ</span>
+                        <div class="text-3xl font-bold text-green-600"><span id="totalPrice">0</span> ฿</div>
+                    </div>
+                </div>
+
+                <!-- เปลี่ยนประเภทปุ่มเป็น button ธรรมดา เพื่อให้เปิด Pop-up ก่อน -->
+                <button type="button" id="openModalBtn" class="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-3.5 rounded-lg transition duration-200 flex items-center justify-center gap-2 shadow-lg">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.036 9.608.391.084.922.258 1.057.592.122.303.079.778.039 1.085l-.171 1.027c-.053.303-.242 1.186 1.039.647 1.281-.54 6.911-4.069 9.428-6.967 1.739-1.907 2.572-4.137 2.572-5.992zm-15.111 2.923h-2.909c-.214 0-.389-.176-.389-.389v-4.912c0-.214.175-.389.389-.389h2.909c.214 0 .389.175.389.389v.766c0 .214-.175.389-.389.389h-2.143v1.077h2.143c.214 0 .389.175.389.389v.765c0 .214-.175.389-.389.389h-2.143v1.149h2.143c.214 0 .389.175.389.389v.765c0 .215-.175.389-.389.389zm4.278-.778c0 .214-.175.389-.389.389h-.777c-.214 0-.389-.175-.389-.389v-4.912c0-.214.175-.389.389-.389h.777c.214 0 .389.175.389.389v4.912zm4.181-2.986c-.214 0-.389.175-.389.389v1.826l-2.073-2.12c-.066-.067-.156-.105-.251-.105h-.764c-.214 0-.389.175-.389.389v4.912c0 .214.175.389.389.389h.777c.214 0 .389-.175.389-.389v-1.826l2.073 2.12c.066.068.156.106.251.106h.764c.214 0 .389-.175.389-.389v-4.912c0-.214-.175-.389-.389-.389h-.777z"/></svg>
+                    ส่งข้อมูลให้แอดมินทาง LINE
                 </button>
             </form>
         </div>
     </div>
 
-    <script>
-        // ส่วนของการคำนวณและการทำงาน
-        const levelSelect = document.getElementById('level');
-        const hoursInput = document.getElementById('hours');
-        const chaptersInput = document.getElementById('chapters');
-        const totalPriceEl = document.getElementById('totalPrice');
-        const orderForm = document.getElementById('orderForm');
-        const contactInfo = document.getElementById('contactInfo');
-
-        function calculatePrice() {
-            // ดึงราคาที่ซ่อนไว้ใน option
-            const selectedOption = levelSelect.options[levelSelect.selectedIndex];
-            const ratePerHour = parseInt(selectedOption.getAttribute('data-hr'));
-            const ratePerChapter = parseInt(selectedOption.getAttribute('data-ch'));
+    <!-- ส่วนของ Modal (Pop-up แจ้งเตือนเงื่อนไข) -->
+    <div id="conditionModal" class="fixed inset-0 w-full h-full z-50 hidden items-center justify-center">
+        <!-- ฉากหลังสีดำโปร่งแสง -->
+        <div class="absolute inset-0 bg-black opacity-50" id="modalOverlay"></div>
+        
+        <!-- กล่องข้อความ Pop-up -->
+        <div class="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full mx-4 overflow-hidden transform scale-95 transition-transform" id="modalContent">
             
-            const hours = parseInt(hoursInput.value) || 0;
-            const chapters = parseInt(chaptersInput.value) || 0;
+            <div class="bg-amber-100 p-4 border-b border-amber-200 flex items-center gap-3">
+                <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <h2 class="text-lg font-bold text-amber-800">กรุณาอ่านก่อนยืนยัน</h2>
+            </div>
+            
+            <div class="p-5">
+                <ul class="text-sm text-gray-700 space-y-3">
+                    <li class="flex items-start">
+                        <span class="text-amber-500 mr-2">📌</span> 
+                        <span>นี่เป็นเพียงการคำนวณราคาเบื้องต้นเท่านั้น <strong>ราคาอาจมีการเปลี่ยนแปลงเล็กน้อย</strong> หากมีรายละเอียดเพิ่มเติม กรุณารอแอดมินสรุปยอดสุดท้ายให้ในแชทอีกครั้งนะคะ</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-amber-500 mr-2">📌</span> 
+                        <span>ขณะนี้ <strong>งดรับงานเร่งด่วนชั่วคราว</strong> งานปกติจะใช้เวลาดำเนินการ 1-3 วันค่ะ</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-amber-500 mr-2">📌</span> 
+                        <span>ลูกค้าโอนเงินชำระค่าบริการ <strong>หลังจากงานเสร็จเรียบร้อยแล้วเท่านั้น</strong> ค่ะ</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="p-4 bg-gray-50 border-t flex gap-2">
+                <button type="button" id="closeModalBtn" class="flex-1 bg-white border border-gray-300 text-gray-700 font-medium py-2 rounded-lg hover:bg-gray-100 transition">
+                    กลับไปแก้ไข
+                </button>
+                <button type="button" id="confirmSubmitBtn" class="flex-1 bg-green-500 text-white font-medium py-2 rounded-lg hover:bg-green-600 transition shadow">
+                    ยอมรับและไปที่ LINE
+                </button>
+            </div>
+        </div>
+    </div>
 
-            // สูตรคำนวณ: (ชั่วโมง * เรทชั่วโมง) + (บท * เรทบท)
-            const total = (hours * ratePerHour) + (chapters * ratePerChapter);
+    <script>
+        const form = document.getElementById('orderForm');
+        const levelSelect = document.getElementById('level');
+        const chaptersInput = document.getElementById('chapters');
+        const extraUnitSelect = document.getElementById('extraUnit');
+        const totalHoursInput = document.getElementById('totalHours');
+        const hourCostWarning = document.getElementById('hourCostWarning');
+        
+        const totalPriceEl = document.getElementById('totalPrice');
+        const priceBreakdownEl = document.getElementById('priceBreakdown');
+        const chapterCountBox = document.getElementById('chapterCountBox');
+        const extraUnitBox = document.getElementById('extraUnitBox');
+
+        // ฟังก์ชันคำนวณเงิน
+        function calculatePrice() {
+            const selectedOpt = levelSelect.options[levelSelect.selectedIndex];
+            let basePrice = 0;
+            let type = document.querySelector('input[name="serviceType"]:checked').value;
+            let breakdownHTML = '';
+            
+            if (parseInt(chaptersInput.value) > 25) {
+                chaptersInput.value = 25;
+            }
+
+            chapterCountBox.style.display = (type === 'chapter') ? 'block' : 'none';
+            extraUnitBox.style.display = (type === 'full') ? 'block' : 'none';
+
+            if (type === 'full') {
+                basePrice = parseInt(selectedOpt.getAttribute('data-full'));
+                let extraUnitCost = parseInt(extraUnitSelect.value);
+                
+                breakdownHTML += `<div class="flex justify-between"><span>ค่าบริการ</span><span>${basePrice} ฿</span></div>`;
+                if (extraUnitCost > 0) {
+                    breakdownHTML += `<div class="flex justify-between"><span>บวกเพิ่มตามจำนวนบท</span><span>${extraUnitCost} ฿</span></div>`;
+                }
+                basePrice += extraUnitCost;
+
+            } else if (type === 'chapter') {
+                let qty = parseInt(chaptersInput.value) || 0;
+                let rate = parseInt(selectedOpt.getAttribute('data-chap'));
+                basePrice = rate * qty;
+                breakdownHTML += `<div class="flex justify-between"><span>ค่าบริการ (${qty} บท)</span><span>${basePrice} ฿</span></div>`;
+
+            } else if (type === 'test') {
+                basePrice = parseInt(selectedOpt.getAttribute('data-test'));
+                breakdownHTML += `<div class="flex justify-between"><span>ค่าบริการ</span><span>${basePrice} ฿</span></div>`;
+            }
+
+            let totalHours = parseInt(totalHoursInput.value) || 0;
+            let chargeableHours = 0;
+            let hoursCost = 0;
+
+            if (totalHours > 6) {
+                chargeableHours = totalHours - 6; 
+                hoursCost = chargeableHours * 5;
+                hourCostWarning.style.display = 'block';
+                breakdownHTML += `<div class="flex justify-between"><span>เพิ่มเวลา (${chargeableHours} ชม.)</span><span>${hoursCost} ฿</span></div>`;
+            } else {
+                hourCostWarning.style.display = 'none';
+            }
+
+            let total = basePrice + hoursCost;
+            priceBreakdownEl.innerHTML = breakdownHTML;
             totalPriceEl.textContent = total.toLocaleString();
+            
+            return { total, totalHours, hoursCost }; 
         }
 
-        // เมื่อมีการเปลี่ยนเลเวล จำนวนชั่วโมง หรือจำนวนบท ให้คำนวณใหม่ทันที
-        levelSelect.addEventListener('change', calculatePrice);
-        hoursInput.addEventListener('input', calculatePrice);
-        chaptersInput.addEventListener('input', calculatePrice);
+        form.addEventListener('change', calculatePrice);
+        form.addEventListener('input', calculatePrice);
+        window.addEventListener('load', calculatePrice);
 
-        // เมื่อกดปุ่มส่งข้อมูล
-        orderForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // ป้องกันเว็บรีเฟรช
-            const total = totalPriceEl.textContent;
-            const levelText = levelSelect.options[levelSelect.selectedIndex].text;
+
+        // --- ส่วนควบคุม Modal (Pop-up) ---
+        const openModalBtn = document.getElementById('openModalBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const conditionModal = document.getElementById('conditionModal');
+        const modalContent = document.getElementById('modalContent');
+        const confirmSubmitBtn = document.getElementById('confirmSubmitBtn');
+
+        openModalBtn.addEventListener('click', function() {
+            if(!document.getElementById('contactInfo').value) {
+                alert("กรุณากรอกชื่อลูกค้าก่อนครับ");
+                document.getElementById('contactInfo').focus();
+                return;
+            }
+            document.body.classList.add('modal-active');
+            conditionModal.classList.remove('hidden');
+            conditionModal.classList.add('flex');
             
-            const summary = `มีลูกค้าส่งข้อมูลมาจ้า!\n` +
-                            `ติดต่อ: ${contactInfo.value}\n` +
-                            `ระดับ: ${levelText}\n` +
-                            `ชั่วโมง: ${hoursInput.value} ชม.\n` +
-                            `จำนวนบท: ${chaptersInput.value} บท\n` +
-                            `ราคาประเมิน: ${total} บาท`;
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
+            }, 10);
+        });
+
+        function closeModal() {
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
             
-            // แสดงข้อมูลขึ้นมาให้ดูเบื้องต้น
-            alert("ระบบจำลองการเตรียมข้อมูลส่งหาคุณ:\n\n" + summary);
+            setTimeout(() => {
+                conditionModal.classList.add('hidden');
+                conditionModal.classList.remove('flex');
+                document.body.classList.remove('modal-active');
+            }, 200);
+        }
+
+        closeModalBtn.addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', closeModal);
+
+        confirmSubmitBtn.addEventListener('click', function() {
+            const calcData = calculatePrice();
             
-            // **คำแนะนำเพิ่มเติมสำหรับการใช้งานจริง:**
-            // คุณสามารถนำข้อมูล summary นี้ไปเขียนต่อยอดให้ส่งเข้า LINE Notify 
-            // เพื่อเด้งเตือนในมือถือของคุณทันทีที่ลูกค้ากดปุ่มส่งข้อมูลได้
+            let typeText = "";
+            const typeValue = document.querySelector('input[name="serviceType"]:checked').value;
+            if(typeValue === 'full') {
+                const unitOption = extraUnitSelect.options[extraUnitSelect.selectedIndex].text;
+                typeText = `เหมาเลเวล (${unitOption})`;
+            } else if (typeValue === 'chapter') {
+                typeText = `ทำบางบท (${chaptersInput.value} บท)`;
+            } else {
+                typeText = `บททดสอบอย่างเดียว`;
+            }
+
+            const customerName = document.getElementById('contactInfo').value;
+            const levelText = levelSelect.options[levelSelect.selectedIndex].text.split(' / ')[0];
+
+            const message = `สอบถามการจ้างทำ ED \n` +
+                            `👤 ชื่อ: ${customerName}\n` +
+                            `📚 เลเวล: ${levelText}\n` +
+                            `📝 รูปแบบ: ${typeText}\n` +
+                            `⏳ เวลาที่ต้องการ: ${calcData.totalHours} ชั่วโมง\n` +
+                            `⚠️ (ทราบเงื่อนไข: ราคานี้ประเมินเบื้องต้น, โอนเงินหลังงานเสร็จ, รอรับงาน 1-3 วัน)\n` +
+                            `💰 ยอดประเมิน: ${calcData.total} บาท`;
+
+            // ไอดีไลน์ถูกเปลี่ยนเป็น @265vgmtu ที่นี่ครับ
+            const lineOA_ID = "@265vgmtu"; 
+            const encodedMessage = encodeURIComponent(message);
+            window.location.href = `https://line.me/R/oaMessage/${lineOA_ID}/?${encodedMessage}`;
         });
     </script>
 </body>
