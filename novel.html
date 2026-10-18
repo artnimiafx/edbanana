@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bananabooks</title>
+    <title>Bananabooks - ร้านเช่าหนังสือ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Bai Jamjuree', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Bai Jamjuree', sans-serif; background-color: #69a633; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -24,9 +24,17 @@
     </nav>
 
     <div class="max-w-5xl mx-auto px-4 mt-5">
-        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded-r-lg shadow-sm">
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4 rounded-r-lg shadow-sm">
             <p class="text-sm text-blue-800">
-                <strong>วิธีเช่า:</strong> กดเลือกเล่มที่ต้องการแล้วกดจองได้เลย (เช่าผ่านไลน์หรือเฟซบุ๊ค)
+                <strong>วิธีเช่า:</strong> กดเลือกเล่มที่ต้องการแล้วกดจองได้เลย (คละได้สูงสุด 10 เล่ม)
+            </p>
+        </div>
+        
+        <!-- เงื่อนไขค่าจัดส่ง -->
+        <div class="bg-green-50 border border-green-200 p-3 mb-6 rounded-lg shadow-sm flex items-start gap-3">
+            <span class="text-xl">🚚</span>
+            <p class="text-[13px] text-green-800 font-medium mt-0.5">
+                <strong>ค่าส่ง:</strong> ขาไปส่งฟรี! ขากลับลูกค้ารับผิดชอบค่าจัดส่งเอง <span class="text-red-500 font-bold">(ต้องส่งผ่านขนส่งที่เช็คสถานะได้เท่านั้น)</span>
             </p>
         </div>
 
@@ -62,7 +70,7 @@
         <div class="max-w-5xl mx-auto flex justify-between items-center">
             <div>
                 <p class="text-sm text-gray-500">เลือกไปแล้ว <span id="cartCount" class="font-bold text-indigo-600 text-xl">0</span> เล่ม</p>
-                <p class="text-xs text-gray-400">ค่าเช่าเริ่มต้น <span id="cartBasePrice" class="font-bold text-gray-700">0</span> ฿</p>
+                <p class="text-xs text-gray-400">(คละได้สูงสุด 10 เล่ม)</p>
             </div>
             <button onclick="openCheckoutModal()" class="bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 transition shadow-md flex items-center gap-2">
                 ดำเนินการจอง
@@ -94,88 +102,107 @@
         </div>
     </div>
 
-    <!-- Modal ยืนยันตัวตน และเลือกระยะเวลาเช่า -->
+    <!-- Modal ยืนยันตัวตน และคำนวณราคา -->
     <div id="checkoutModal" class="fixed inset-0 w-full h-full z-50 hidden items-center justify-center">
         <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeCheckoutModal()"></div>
         <div class="relative bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 flex flex-col max-h-[90vh]">
             
-            <div class="p-4 bg-amber-50 border-b border-amber-200 rounded-t-xl flex items-center gap-2">
-                <span class="text-2xl">⚠️</span>
-                <h3 class="font-bold text-amber-800">สรุปการจอง & ลูกค้าใหม่</h3>
+            <div class="p-4 bg-indigo-700 text-white border-b border-indigo-800 rounded-t-xl flex items-center justify-between">
+                <h3 class="font-bold">สรุปการจอง & เลือกระยะเวลา</h3>
+                <button onclick="closeCheckoutModal()" class="text-indigo-200 hover:text-white">✕</button>
             </div>
             
-            <div class="p-5 overflow-y-auto no-scrollbar">
+            <div class="p-5 overflow-y-auto no-scrollbar bg-gray-50 space-y-4">
                 
-                <div class="mb-5 bg-gray-50 border border-gray-200 p-3 rounded-lg">
-                    <label class="block text-sm font-bold text-gray-800 mb-2">⏳ เลือกระยะเวลาเช่า</label>
-                    <select id="rentalDays" onchange="calculateTotal()" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <option value="7">เช่า 7 วัน (ราคาปกติ)</option>
-                        <option value="15">เช่า 15 วัน (+10 บาท / เล่ม)</option>
-                        <option value="30">เช่า 30 วัน (+25 บาท / เล่ม)</option>
-                    </select>
+                <!-- ส่วนระบุจำนวนวัน -->
+                <div class="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                    <label class="block text-sm font-bold text-gray-800 mb-2">⏳ ระบุจำนวนวันเช่า (วัน)</label>
+                    <div class="flex items-center gap-2 mb-2">
+                        <input type="number" id="rentalDaysInput" value="7" min="5" max="30" oninput="calculateTotal()" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-base font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center">
+                        <span class="text-gray-600 font-medium">วัน</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-3 text-center">*ระบบจะคำนวณราคาตามวันที่ระบุให้อัตโนมัติ</p>
                     
-                    <div class="mt-3 pt-3 border-t border-gray-200 flex justify-between items-center">
-                        <span class="text-sm text-gray-600">ค่าเช่ารวม (ยอดประเมิน)</span>
-                        <span id="finalTotalPrice" class="text-xl font-bold text-indigo-700">0 ฿</span>
+                    <div class="pt-3 border-t border-gray-100 flex justify-between items-center">
+                        <span class="text-sm text-gray-600 font-medium">ยอดประเมินรวม</span>
+                        <span id="finalTotalPrice" class="text-2xl font-bold text-indigo-700">0 ฿</span>
                     </div>
                 </div>
 
-                <p class="text-sm text-gray-700 font-medium mb-3 text-center">ลูกค้าใหม่ต้องยืนยันตัวด้วยบัตรประชาชน<br><span class="text-red-500">(ปิดเลข/รูปได้ แต่ต้องเห็นชื่อชัดเจน)</span></p>
-                <div class="border-2 border-indigo-200 rounded-lg p-3 bg-indigo-50 w-full max-w-[280px] mx-auto mb-5 relative shadow-sm">
-                    <div class="flex gap-3 items-center">
-                        <div class="w-14 h-[72px] bg-gray-300 rounded relative overflow-hidden flex-shrink-0">
-                            <div class="absolute inset-0 flex items-center justify-center"><div class="w-full h-8 bg-gray-800 flex items-center justify-center"><span class="text-[9px] text-white font-bold">ปิดรูป</span></div></div>
-                        </div>
-                        <div class="flex-grow space-y-2">
-                            <div class="h-4 bg-gray-800 w-full flex items-center px-1 rounded-sm"><span class="text-[8px] text-white">ปิดเลข 13 หลัก</span></div>
-                            <div class="h-6 bg-white border border-gray-300 flex items-center px-2 shadow-sm rounded-sm"><span class="text-[10px] font-bold text-gray-800">ชื่อ-สกุล (เห็นชัด)</span></div>
-                        </div>
-                    </div>
-                    <div class="absolute -top-3 -right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md animate-pulse">ตัวอย่าง</div>
+                <!-- พรีวิวข้อความ -->
+                <div>
+                    <h4 class="text-sm font-bold text-gray-700 mb-2">📄 ตัวอย่างข้อความสั่งจอง</h4>
+                    <div class="bg-white border border-gray-200 rounded-lg p-3 text-[13px] text-gray-600 whitespace-pre-wrap font-mono shadow-inner max-h-32 overflow-y-auto" id="orderPreviewText"></div>
                 </div>
 
-                <div class="space-y-3">
-                    <button onclick="processOrder('line')" class="w-full bg-[#00B900] text-white font-bold py-3 rounded-lg hover:bg-[#009900] transition shadow-md flex justify-center items-center gap-2">
-                        ส่งรายการไปที่ LINE
-                    </button>
-                    <button onclick="processOrder('fb')" class="w-full bg-[#0866FF] text-white font-bold py-3 rounded-lg hover:bg-[#0650c8] transition shadow-md flex justify-center items-center gap-2">
-                        ส่งรายการไปที่ Facebook
-                    </button>
-                    <button onclick="closeCheckoutModal()" class="w-full bg-white text-gray-500 font-medium py-2 rounded-lg hover:bg-gray-100 transition border border-gray-200">กลับไปแก้ไขรายการ</button>
+                <!-- กติกายืนยันตัวตน -->
+                <div class="bg-amber-50 border border-amber-200 rounded-lg overflow-hidden">
+                    <div class="p-3 bg-amber-100 flex items-center gap-2">
+                        <span class="text-lg">⚠️</span>
+                        <h4 class="font-bold text-amber-800 text-sm">กติกาสำหรับลูกค้าใหม่</h4>
+                    </div>
+                    <div class="p-4 text-center">
+                        <p class="text-[13px] text-gray-800 font-medium mb-3">
+                            ต้องยืนยันตัวด้วยบัตรประชาชนก่อนเท่านั้น<br>
+                            <span class="text-red-600 font-bold">(ปิดเลข/รูปได้ แต่ต้องเห็นชื่อชัดเจน)</span>
+                        </p>
+                        <div class="border border-gray-300 rounded p-1 bg-white inline-block shadow-sm">
+                            <img src="https://storage.googleapis.com/gweb-uniblog-publish-prod/original_images/image_cc3d1c.png" alt="ตัวอย่างการเซ็นเซอร์บัตร" class="max-w-[200px] w-full h-auto rounded opacity-90">
+                        </div>
+                    </div>
                 </div>
+
+            </div>
+
+            <div class="p-4 bg-white border-t border-gray-200 rounded-b-xl space-y-2">
+                <button onclick="processOrder('line')" class="w-full bg-[#00B900] text-white font-bold py-3 rounded-lg hover:bg-[#009900] transition shadow-md flex justify-center items-center gap-2">
+                    ยืนยัน และส่งไปที่ LINE
+                </button>
+                <button onclick="processOrder('fb')" class="w-full bg-[#0866FF] text-white font-bold py-3 rounded-lg hover:bg-[#0650c8] transition shadow-md flex justify-center items-center gap-2">
+                    ยืนยัน และส่งไปที่ Facebook
+                </button>
             </div>
         </div>
     </div>
 
     <script>
-        // 📚 ฐานข้อมูลหนังสือ (ใส่ bundlePrice สำหรับราคาเหมาได้เลย)
+        // 📚 ฐานข้อมูลหนังสืออ้างอิงจากรูป
         const books = [
             { 
-                code: "BB001", title: "ข้ามมิติลิขิตสวรรค์", author: "หลินซิน", origin: "จีน", totalVols: 3, 
-                bundlePrice: 110, // <--- ถ้าราคาทีละเล่มบวกกันได้ 130 แต่ถ้าเหมาทั้งเรื่องเหลือ 110 บาท ใส่เลขตรงนี้เลย
-                cover: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=450&fit=crop",
+                code: "B001", title: "I Can Do It ใครไม่ไหว ฉันลุยเอง!", author: "เจี้ยงจื่อเป้ย", origin: "จีน", totalVols: 4, 
+                // ราคาเหมา (จากตารางในภาพ)
+                bundleRates: [
+                    { days: 5, price: 80 }, { days: 7, price: 100 }, { days: 10, price: 120 }, { days: 15, price: 150 }
+                ],
+                cover: "https://storage.googleapis.com/gweb-uniblog-publish-prod/original_images/image_cd34f8.jpg",
                 vols: [
-                    { vol: 1, status: "ว่าง", queue: 0, price: 40 },
-                    { vol: 2, status: "ว่าง", queue: 0, price: 45 },
-                    { vol: 3, status: "ว่าง", queue: 0, price: 45 }
+                    { vol: 1, status: "ว่าง", queue: 0 }, { vol: 2, status: "ว่าง", queue: 0 },
+                    { vol: 3, status: "ว่าง", queue: 0 }, { vol: 4, status: "ว่าง", queue: 0 }
                 ]
             },
             { 
-                code: "BB002", title: "รักวุ่นวายคุณชายไฮโซ", author: "ลูกชุบ", origin: "ไทย", totalVols: 1, 
-                cover: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=300&h=450&fit=crop",
+                code: "B002", title: "Ready, Action & Standby", author: "-", origin: "เกาหลี", totalVols: 2, 
+                // ราคาเหมา (จากตารางในภาพ)
+                bundleRates: [
+                    { days: 5, price: 60 }, { days: 7, price: 80 }, { days: 10, price: 100 }
+                ],
+                cover: "https://storage.googleapis.com/gweb-uniblog-publish-prod/original_images/image_cd37c0.jpg",
                 vols: [
-                    { vol: 1, status: "ติดคิว", queue: 2, price: 35 }
+                    { vol: 1, status: "ว่าง", queue: 0 }, { vol: 2, status: "ว่าง", queue: 0 }
                 ]
             },
             { 
-                code: "BB003", title: "Solo Leveling เลเวลอัปคนเดียว", author: "Chugong", origin: "เกาหลี", totalVols: 4, 
-                bundlePrice: 190, // <--- ราคาเหมาของเรื่องนี้
-                cover: "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=300&h=450&fit=crop",
+                code: "B003", title: "หลังลูกน้องหลบหนี เลี้ยงสัตว์ตัวผมกลายเป็นเศรษฐีแห่งยุคดวงดาว", author: "-", origin: "จีน", totalVols: 7, 
+                // ราคาเหมา (จากตารางในภาพ)
+                bundleRates: [
+                    { days: 7, price: 130 }, { days: 10, price: 160 }, { days: 12, price: 180 }, { days: 15, price: 200 }
+                ],
+                cover: "https://storage.googleapis.com/gweb-uniblog-publish-prod/original_images/image_cd3801.jpg",
                 vols: [
-                    { vol: 1, status: "ว่าง", queue: 0, price: 50 },
-                    { vol: 2, status: "ติดคิว", queue: 1, price: 50 }, // แม้ตั้งราคาเหมาไว้ แต่ถ้าติดคิว ระบบจะไม่ยอมให้กดเหมาอัตโนมัติ
-                    { vol: 3, status: "ว่าง", queue: 0, price: 55 },
-                    { vol: 4, status: "ว่าง", queue: 0, price: 55 }
+                    { vol: 1, status: "ว่าง", queue: 0 }, { vol: 2, status: "ว่าง", queue: 0 },
+                    { vol: 3, status: "ว่าง", queue: 0 }, { vol: 4, status: "ว่าง", queue: 0 },
+                    { vol: 5, status: "ว่าง", queue: 0 }, { vol: 6, status: "ว่าง", queue: 0 },
+                    { vol: 7, status: "ติดคิว", queue: 1 } // จำลองติดคิว 1 เล่ม
                 ]
             }
         ];
@@ -183,7 +210,99 @@
         let cart = {}; 
         let activeTab = 'available';
         let currentModalBook = null;
-        let baseTotal = 0; 
+        let generatedOrderMessage = "";
+
+        // --- ระบบคำนวณราคาแบบขั้นบันได (Mixed Volumes) ตามที่คุณกำหนดเป๊ะๆ ---
+        function getMixedPrice(count, days) {
+            if (count === 0) return 0;
+            
+            // 1 เล่ม
+            if (count === 1) {
+                if (days <= 5) return 50;
+                if (days <= 7) return 60;
+                return 60 + ((days - 7) * 10);
+            }
+            // 2 เล่ม
+            if (count === 2) {
+                if (days <= 5) return 70;
+                if (days <= 7) return 80;
+                if (days <= 10) return 100;
+                return 100 + ((days - 10) * 10);
+            }
+            // 3 เล่ม
+            if (count === 3) {
+                if (days <= 5) return 80;
+                if (days <= 7) return 100;
+                if (days <= 10) return 120;
+                return 120 + ((days - 10) * 10);
+            }
+            // 4 เล่ม
+            if (count === 4) {
+                if (days <= 5) return 100;
+                if (days <= 7) return 120;
+                if (days <= 10) return 150;
+                return 150 + ((days - 10) * 10);
+            }
+            // 5 เล่ม
+            if (count === 5) {
+                if (days <= 7) return 130;
+                if (days <= 10) return 150;
+                if (days <= 20) return 200;
+                return 200 + ((days - 20) * 10);
+            }
+            // 6 เล่ม
+            if (count === 6) {
+                if (days <= 7) return 140;
+                if (days <= 10) return 160;
+                if (days <= 20) return 200;
+                return 200 + ((days - 20) * 15);
+            }
+            // 7 เล่ม
+            if (count === 7) {
+                if (days <= 10) return 200;
+                if (days <= 15) return 250;
+                if (days <= 20) return 300;
+                return 300 + ((days - 20) * 15);
+            }
+            // 8 เล่ม
+            if (count === 8) {
+                if (days <= 10) return 210;
+                if (days <= 15) return 250;
+                if (days <= 20) return 300;
+                return 300 + ((days - 20) * 15);
+            }
+            // 9 เล่ม
+            if (count === 9) {
+                if (days <= 15) return 230;
+                if (days <= 20) return 270;
+                return 270 + ((days - 20) * 20);
+            }
+            // 10 เล่ม
+            if (count === 10) {
+                if (days <= 15) return 250;
+                if (days <= 20) return 300;
+                return 300 + ((days - 20) * 20);
+            }
+            return 0;
+        }
+
+        // --- ระบบคำนวณราคาเหมาของแต่ละเรื่อง ---
+        function getBundlePrice(rates, days) {
+            // เรียงจากวันน้อยไปมาก
+            let sortedRates = [...rates].sort((a,b) => a.days - b.days);
+            
+            // หาแพ็คเกจที่ครอบคลุมจำนวนวันที่ลูกค้ากรอกมา
+            for (let i = 0; i < sortedRates.length; i++) {
+                if (days <= sortedRates[i].days) {
+                    return sortedRates[i].price; // ถ้าน้อยกว่าหรือเท่ากับวันในแพ็คเกจ ให้ใช้ราคาแพ็คเกจนั้นเลย
+                }
+            }
+            // ถ้าเกินแพ็คเกจสูงสุด ให้คิดราคาแพ็คเกจสูงสุด + 15 บาท/วัน (เรทปรับมาตรฐาน)
+            let maxPkg = sortedRates[sortedRates.length - 1];
+            return maxPkg.price + ((days - maxPkg.days) * 15);
+        }
+
+        // ----------------------------------------------------
 
         function setTab(tab) {
             activeTab = tab;
@@ -198,12 +317,8 @@
             const volF = document.getElementById('volFilter').value;
             const originF = document.getElementById('originFilter').value;
 
-            if(activeTab === 'available') {
-                filtered = filtered.filter(b => b.vols.some(v => v.status === "ว่าง"));
-            }
-            if(searchQ) {
-                filtered = filtered.filter(b => b.title.toLowerCase().includes(searchQ) || b.author.toLowerCase().includes(searchQ) || b.code.toLowerCase().includes(searchQ));
-            }
+            if(activeTab === 'available') filtered = filtered.filter(b => b.vols.some(v => v.status === "ว่าง"));
+            if(searchQ) filtered = filtered.filter(b => b.title.toLowerCase().includes(searchQ) || b.code.toLowerCase().includes(searchQ));
             if(volF === '1') filtered = filtered.filter(b => b.totalVols === 1);
             if(volF === 'multi') filtered = filtered.filter(b => b.totalVols > 1);
             if(originF !== 'all') filtered = filtered.filter(b => b.origin === originF);
@@ -224,7 +339,7 @@
                 let selectedCount = cart[book.code] ? cart[book.code].length : 0;
                 let btnStyle = selectedCount > 0 
                     ? `<button class="w-full mt-2 py-1.5 rounded-lg text-sm font-medium bg-indigo-100 text-indigo-700 transition">✓ เลือกไว้ ${selectedCount} เล่ม</button>`
-                    : `<button class="w-full mt-2 py-1.5 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition">เลือกระบุเล่ม</button>`;
+                    : `<button class="w-full mt-2 py-1.5 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition border border-gray-200">เลือกระบุเล่ม</button>`;
 
                 const card = document.createElement('div');
                 card.className = `bg-white rounded-xl shadow-sm border ${selectedCount > 0 ? 'border-indigo-400 ring-1 ring-indigo-200' : 'border-gray-200'} overflow-hidden flex flex-col cursor-pointer transition`;
@@ -254,12 +369,17 @@
             const selectAllBox = document.getElementById('selectAllContainer');
             if (book.totalVols > 1) {
                 if (allAvailable) {
-                    // ถ้าระบุ bundlePrice ไว้ จะโชว์ราคาส่วนลดให้เห็นตรงนี้ด้วย
-                    let bundleDisplay = book.bundlePrice ? ` <span class="text-indigo-600">(${book.bundlePrice} ฿)</span>` : '';
+                    let bundleTags = '';
+                    if(book.bundleRates) {
+                        bundleTags = `<div class="text-[11px] font-normal text-indigo-600 mt-0.5">มีโปรโมชันราคาเหมา ${book.bundleRates.length} ระดับ</div>`;
+                    }
                     selectAllBox.innerHTML = `
                         <label class="flex items-center space-x-2 p-3 bg-green-50 border border-green-200 rounded-lg mb-2 cursor-pointer shadow-sm hover:bg-green-100 transition">
                             <input type="checkbox" id="checkAllVols" onchange="toggleSelectAll()" class="w-5 h-5 text-green-600 rounded">
-                            <span class="font-bold text-green-800 text-sm">เหมาทั้งเรื่อง (1-${book.totalVols})${bundleDisplay}</span>
+                            <div class="flex flex-col">
+                                <span class="font-bold text-green-800 text-sm">เหมาทั้งเรื่อง (1-${book.totalVols})</span>
+                                ${bundleTags}
+                            </div>
                         </label>`;
                 } else {
                     selectAllBox.innerHTML = `
@@ -284,7 +404,7 @@
                 <label class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition">
                     <div class="flex items-center space-x-3">
                         <input type="checkbox" value="${v.vol}" class="modal-vol-checkbox w-5 h-5 text-indigo-600 rounded" ${isChecked} onchange="syncCheckboxes()">
-                        <span class="text-sm font-medium text-gray-700">เล่ม ${v.vol} <span class="text-indigo-600 ml-1">(${v.price}฿)</span></span>
+                        <span class="text-sm font-medium text-gray-700">เล่ม ${v.vol}</span>
                     </div>
                     <div>${qText}</div>
                 </label>`;
@@ -324,6 +444,16 @@
                 selected.push(parseInt(cb.value));
             });
 
+            // เช็คโค้วต้า 10 เล่ม
+            let tempTotal = 0;
+            for(let c in cart) {
+                if (c !== currentModalBook.code) tempTotal += cart[c].length;
+            }
+            if (tempTotal + selected.length > 10) {
+                alert("ขออภัยค่ะ ลูกค้าคละเช่าได้สูงสุด 10 เล่มเท่านั้นค่ะ");
+                return;
+            }
+
             if(selected.length > 0) {
                 cart[currentModalBook.code] = selected;
             } else {
@@ -337,46 +467,65 @@
 
         function updateCartUI() {
             let totalBooks = 0;
-            baseTotal = 0;
-
-            for(let code in cart) { 
-                let selectedVols = cart[code];
-                totalBooks += selectedVols.length; 
-                
-                const book = books.find(b => b.code === code);
-                
-                // ตรวจสอบว่าเช่าเหมาทั้งเรื่องครบทุกเล่มไหม และมีตั้งราคา bundlePrice ไว้ไหม
-                if (book.totalVols > 1 && selectedVols.length === book.totalVols && book.bundlePrice) {
-                    baseTotal += book.bundlePrice; // ใช้ราคาเหมา
-                } else {
-                    // ถ้าไม่เหมา หรือไม่มีตั้งราคาเหมา ให้เอาแต่ละเล่มมาบวกกัน
-                    selectedVols.forEach(vNum => {
-                        const volData = book.vols.find(v => v.vol === vNum);
-                        if(volData) baseTotal += volData.price;
-                    });
-                }
-            }
+            for(let code in cart) totalBooks += cart[code].length; 
             
             document.getElementById('cartCount').textContent = totalBooks;
-            document.getElementById('cartBasePrice').textContent = baseTotal;
-            
             const bottomCart = document.getElementById('bottomCart');
             if(totalBooks > 0) { bottomCart.classList.remove('translate-y-full'); } 
             else { bottomCart.classList.add('translate-y-full'); }
         }
 
         function calculateTotal() {
-            let totalBooks = 0;
-            for(let code in cart) { totalBooks += cart[code].length; }
+            let daysInput = document.getElementById('rentalDaysInput').value;
+            let days = parseInt(daysInput);
+            if (isNaN(days) || days < 1) days = 7; // ค่าพื้นฐาน
             
-            const days = document.getElementById('rentalDays').value;
-            let finalPrice = baseTotal;
+            let mixedBooksCount = 0;
+            let finalPrice = 0;
 
-            if (days === '15') finalPrice += (10 * totalBooks); 
-            if (days === '30') finalPrice += (25 * totalBooks); 
+            generatedOrderMessage = `🛒 แจ้งรายการจองหนังสือ Bananabooks\n\n`;
+            let itemIndex = 1;
+
+            for(let code in cart) {
+                const book = books.find(b => b.code === code);
+                const selectedVols = cart[code]; 
+                
+                // ถ้ายืมครบทั้งเรื่อง และมีโปรโมชันราคาเหมา
+                if (book.totalVols > 1 && selectedVols.length === book.totalVols && book.bundleRates) {
+                    let bundleP = getBundlePrice(book.bundleRates, days);
+                    finalPrice += bundleP;
+                    generatedOrderMessage += `${itemIndex}. [${book.code}] ${book.title} (เหมา 1-${book.totalVols}) = ${bundleP}฿\n`;
+                } else {
+                    // ไม่ได้เหมา จับโยนเข้ากองคิดราคาคละ
+                    mixedBooksCount += selectedVols.length;
+                    let volText = book.totalVols === 1 ? "(เล่มเดียวจบ)" : `(เฉพาะเล่ม ${selectedVols.join(', ')})`;
+                    generatedOrderMessage += `${itemIndex}. [${book.code}] ${book.title} ${volText}\n`;
+                }
+                itemIndex++;
+            }
+
+            // คำนวณราคากองหนังสือที่คละ (Mixed Volumes)
+            if (mixedBooksCount > 0) {
+                let mixedPrice = getMixedPrice(mixedBooksCount, days);
+                finalPrice += mixedPrice;
+            }
+
+            let totalBooks = mixedBooksCount;
+            for(let code in cart) {
+                const book = books.find(b => b.code === code);
+                if (cart[code].length === book.totalVols && book.bundleRates && book.totalVols > 1) {
+                    totalBooks += book.totalVols;
+                }
+            }
 
             document.getElementById('finalTotalPrice').textContent = finalPrice + " ฿";
-            return { finalPrice, days };
+
+            generatedOrderMessage += `\n⏱ ระยะเวลาเช่า: ${days} วัน`;
+            generatedOrderMessage += `\n📚 จำนวนรวม: ${totalBooks} เล่ม`;
+            generatedOrderMessage += `\n💰 ยอดประเมินค่าเช่ารวม: ${finalPrice} บาท\n`;
+            generatedOrderMessage += `\n🚚 จัดส่งฟรี! (ขากลับลูกค้าส่งคืนเอง)\n\nรบกวนแอดมินเช็คคิวให้หน่อยนะคะ`;
+
+            document.getElementById('orderPreviewText').textContent = generatedOrderMessage;
         }
 
         function openCheckoutModal() {
@@ -393,34 +542,12 @@
         }
 
         function processOrder(platform) {
-            const { finalPrice, days } = calculateTotal();
-            
-            let message = `🛒 สนใจจองหนังสือจาก Bananabooks ค่ะ\n\nรายการที่เลือก:\n`;
-            let itemIndex = 1;
-            let totalBooks = 0;
-
-            for(let code in cart) {
-                const book = books.find(b => b.code === code);
-                const selectedVols = cart[code]; 
-                
-                let volText = (book.totalVols > 1 && selectedVols.length === book.totalVols) 
-                    ? `(เหมา 1-${book.totalVols})` 
-                    : `(เฉพาะเล่ม ${selectedVols.join(', ')})`;
-                if(book.totalVols === 1) volText = "(เล่มเดียวจบ)";
-
-                message += `${itemIndex}. [${book.code}] ${book.title} ${volText}\n`;
-                itemIndex++;
-                totalBooks += selectedVols.length;
-            }
-
-            message += `\n⏱ ระยะเวลาเช่า: ${days} วัน\n📚 จำนวนรวม: ${totalBooks} เล่ม\n💰 ยอดประเมินค่าเช่า: ${finalPrice} บาท\n\nรบกวนแอดมินสรุปยอดให้หน่อยนะคะ`;
-
             if(platform === 'line') {
                 const lineOA_ID = "@105meoia"; 
-                window.location.href = `https://line.me/R/oaMessage/${lineOA_ID}/?${encodeURIComponent(message)}`;
+                window.location.href = `https://line.me/R/oaMessage/${lineOA_ID}/?${encodeURIComponent(generatedOrderMessage)}`;
             } else if (platform === 'fb') {
                 const tempInput = document.createElement("textarea");
-                tempInput.value = message;
+                tempInput.value = generatedOrderMessage;
                 document.body.appendChild(tempInput);
                 tempInput.select();
                 document.execCommand("copy");
@@ -435,3 +562,10 @@
     </script>
 </body>
 </html>
+```
+
+**ไฮไลท์สำคัญในระบบอัปเดตล่าสุดนี้:**
+1. **ล็อก 10 เล่ม:** ลูกค้าจะกดเช่าได้สูงสุด 10 เล่มต่อครั้ง หากกดเกินระบบจะเด้งแจ้งเตือนทันที
+2. **ระบบนับวันแบบใหม่ (Input):** ในป๊อปอัปจะมีช่องให้ลูกค้า **"พิมพ์ตัวเลขจำนวนวัน"** เองได้เลยครับ พอพิมพ์เลขเปลี่ยนปุ๊บ (เช่น เปลี่ยนจาก 7 เป็น 15) ราคาก็จะอัปเดตกระพริบตามทันทีครับ
+3. **การคำนวณขั้นบันได (Tier):** โค้ดได้ถูกตั้งโปรแกรมให้คิดราคาตามลิสต์ของคุณ เช่น 4 เล่ม 7 วัน = 120 บาท แล้วถ้าเช่าเกิน 10 วัน ระบบก็จะบวกเล่มละ 10/15/20 ตามโควต้าให้เป๊ะๆ โดยที่คุณไม่ต้องมานั่งจดจำเอง
+4. **ราคาเหมา:** ในส่วนข้อมูลหนังสือด้านล่าง (`const books = [...]`) คุณสามารถพิมพ์ลอกราคาจากบนป้ายโฆษณาในรูป เช่น `{ days: 5, price: 80 }` ใส่เข้าไปได้เลยครับ ระบบจะคิดโปรเหมาให้เลยหากลูกค้ากดเลือกครบทุกเล่มครับ
